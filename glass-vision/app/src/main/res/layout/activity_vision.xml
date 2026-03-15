@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- Full-screen camera preview -->
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Semi-transparent overlay for Claude's response -->
+    <ScrollView
+        android:id="@+id/response_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/response_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CC000000"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:lineSpacingExtra="4dp" />
+    </ScrollView>
+
+    <!-- Centered state label -->
+    <TextView
+        android:id="@+id/state_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#80000000"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="@string/state_idle" />
+
+    <!-- Recording indicator (red dot) -->
+    <View
+        android:id="@+id/recording_indicator"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="top|right"
+        android:layout_margin="12dp"
+        android:background="@drawable/red_dot"
+        android:visibility="gone" />
+
+    <!-- Bottom status bar -->
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#80000000"
+        android:textColor="#FFAB40"
+        android:textSize="14sp"
+        android:padding="6dp"
+        android:text="@string/status_disconnected" />
+
+</FrameLayout>

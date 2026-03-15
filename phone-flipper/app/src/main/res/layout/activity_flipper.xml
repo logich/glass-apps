@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@android:color/black">
+
+    <!-- Flipper display area -->
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3">
+
+        <SurfaceView
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:padding="8dp"
+            android:textColor="#BDBDBD"
+            android:textSize="14sp"
+            android:text="Scanning..." />
+    </FrameLayout>
+
+    <!-- D-pad control area -->
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:background="@color/background_dark"
+        android:gravity="center">
+
+        <!-- Center OK button -->
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerInParent="true"
+            android:text="OK"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/flipper_orange" />
+
+        <!-- UP arrow -->
+        <Button
+            android:id="@+id/btn_up"
+            android:layout_width="72dp"
+            android:layout_height="56dp"
+            android:layout_above="@id/btn_ok"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:text="\u25B2"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:backgroundTint="@color/btn_dark" />
+
+        <!-- DOWN arrow -->
+        <Button
+            android:id="@+id/btn_down"
+            android:layout_width="72dp"
+            android:layout_height="56dp"
+            android:layout_below="@id/btn_ok"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:text="\u25BC"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:backgroundTint="@color/btn_dark" />
+
+        <!-- LEFT arrow -->
+        <Button
+            android:id="@+id/btn_left"
+            android:layout_width="56dp"
+            android:layout_height="72dp"
+            android:layout_toLeftOf="@id/btn_ok"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp"
+            android:text="\u25C0"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:backgroundTint="@color/btn_dark" />
+
+        <!-- RIGHT arrow -->
+        <Button
+            android:id="@+id/btn_right"
+            android:layout_width="56dp"
+            android:layout_height="72dp"
+            android:layout_toRightOf="@id/btn_ok"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:text="\u25B6"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:backgroundTint="@color/btn_dark" />
+
+        <!-- BACK button below the cross -->
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="120dp"
+            android:layout_height="48dp"
+            android:layout_below="@id/btn_down"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="BACK"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:backgroundTint="@color/btn_dark" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="flipper_orange">#FF8C00</color>
+    <color name="btn_dark">#333333</color>
+    <color name="btn_dark_pressed">#555555</color>
+    <color name="background_dark">#1A1A1A</color>
+</resources>

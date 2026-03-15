@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Glass Vision</string>
+    <string name="hint_api_key">Anthropic API key</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="btn_clear">Clear History</string>
+    <string name="status_ready">Ready</string>
+    <string name="channel_name">Glass Vision Server</string>
+    <string name="channel_description">Shows when the vision server is running</string>
+</resources>

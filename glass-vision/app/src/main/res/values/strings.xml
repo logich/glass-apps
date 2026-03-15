@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Glass Vision</string>
+    <string name="state_idle">Tap to ask</string>
+    <string name="state_recording">Recording\u2026</string>
+    <string name="state_processing">Thinking\u2026</string>
+    <string name="state_response">Tap to ask again</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_connecting">Connecting\u2026</string>
+    <string name="status_connected">Connected</string>
+</resources>

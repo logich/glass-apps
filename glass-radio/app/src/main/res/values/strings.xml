@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GlassRadio</string>
+    <string name="status_stopped">STOPPED</string>
+    <string name="status_playing">PLAYING</string>
+    <string name="status_buffering">BUFFERING…</string>
+    <string name="no_stations">No stations</string>
+</resources>

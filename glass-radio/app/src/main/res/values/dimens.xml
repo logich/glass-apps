@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Glass display: 640x360 -->
+    <dimen name="station_card_width">280dp</dimen>
+    <dimen name="station_card_height">200dp</dimen>
+    <dimen name="station_card_margin">8dp</dimen>
+    <dimen name="station_card_padding">16dp</dimen>
+    <dimen name="station_name_size">22sp</dimen>
+    <dimen name="station_genre_size">14sp</dimen>
+    <dimen name="status_bar_height">32dp</dimen>
+    <dimen name="status_text_size">14sp</dimen>
+</resources>
