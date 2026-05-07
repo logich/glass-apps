@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Two stacked views, one visible at a time (toggled by tap):
+    window_layout    — title / class / pid HUD
+    terminal_layout  — monospace dashd preview
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <RelativeLayout
+        android:id="@+id/window_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/connecting"
+            android:textColor="#FFFFFF"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/wm_class"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_marginTop="10dp"
+            android:textColor="#B0B0B0"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:textColor="#606060"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:typeface="monospace" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/terminal_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/terminal_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textColor="#D0D0D0"
+            android:textSize="11sp"
+            android:typeface="monospace"
+            android:singleLine="false"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="0.95" />
+
+        <TextView
+            android:id="@+id/terminal_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#606060"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:typeface="monospace" />
+    </LinearLayout>
+
+</FrameLayout>
