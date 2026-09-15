@@ -15,9 +15,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -27,17 +33,34 @@ import javax.net.ssl.X509TrustManager;
 public class MainActivity extends Activity {
 
     private static final String TAG = "Stocks";
-    private static final int IMAGE_COUNT = 10;
     private static final long CYCLE_INTERVAL_MS = 10000;
-    private static final long REFRESH_INTERVAL_MS = 60000;
-    private static final String BASE_URL = "https://stockcharts.com/voyeur/voyeur";
+    // SharpCharts data is delayed, and a sweep is one request per ticker, so
+    // there is nothing to gain from refreshing faster than this.
+    private static final long REFRESH_INTERVAL_MS = 900000;
+    private static final String BASE_URL = "https://stockcharts.com/c-sc/sc";
+    // StockCharts answers the default Java User-Agent with a 404 rather than a
+    // 403, so an unset UA looks exactly like a dead URL.
+    private static final String USER_AGENT =
+        "Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) "
+        + "Chrome/124.0 Safari/537.36";
+    // An unknown symbol comes back as HTTP 200 with a ~2.4 KB "invalid symbol"
+    // placeholder; a real chart is ~20 KB. Size is the only way to tell.
+    private static final int MIN_BYTES = 5000;
+    // Optional one-symbol-per-line override, pushed with:
+    //   adb push tickers.txt /sdcard/glass-stocks-tickers.txt
+    private static final String TICKER_FILE = "/sdcard/glass-stocks-tickers.txt";
+    private static final String[] DEFAULT_TICKERS = {
+        "$SPX", "$COMPQ", "$VIX", "SPY", "QQQ", "IWM", "TLT",
+        "GLD", "USO", "XLE", "XLF", "XLK", "NVDA", "AAPL"
+    };
 
     private ImageView chartImage;
     private TextView counterText;
     private Handler handler;
     private PowerManager.WakeLock wakeLock;
 
-    private final Bitmap[] bitmaps = new Bitmap[IMAGE_COUNT];
+    private String[] tickers = DEFAULT_TICKERS;
+    private Bitmap[] bitmaps = new Bitmap[DEFAULT_TICKERS.length];
     private int currentIndex = 0;
     private boolean running = false;
 
@@ -60,7 +83,41 @@ public class MainActivity extends Activity {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG + ":wl");
 
+        tickers = loadTickers();
+        bitmaps = new Bitmap[tickers.length];
+
         fetchAllImages();
+    }
+
+    private String[] loadTickers() {
+        File file = new File(TICKER_FILE);
+        if (!file.canRead()) {
+            return DEFAULT_TICKERS;
+        }
+        ArrayList<String> found = new ArrayList<String>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.length() > 0 && !line.startsWith("#")) {
+                    found.add(line);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ticker file unreadable, using defaults", e);
+            return DEFAULT_TICKERS;
+        } finally {
+            if (reader != null) {
+                try { reader.close(); } catch (Exception ignored) { }
+            }
+        }
+        if (found.isEmpty()) {
+            return DEFAULT_TICKERS;
+        }
+        Log.d(TAG, "Loaded " + found.size() + " tickers from " + TICKER_FILE);
+        return found.toArray(new String[found.size()]);
     }
 
     @Override
@@ -98,22 +155,34 @@ public class MainActivity extends Activity {
                     sc.init(null, trustAll, new java.security.SecureRandom());
 
                     long timestamp = System.currentTimeMillis();
-                    for (int i = 0; i < IMAGE_COUNT; i++) {
-                        String urlStr = BASE_URL + (i + 1) + ".png?rnd=" + timestamp;
+                    for (int i = 0; i < tickers.length; i++) {
+                        // r= busts StockCharts' cache; without it a refresh can
+                        // hand back the same image for hours.
+                        String urlStr = BASE_URL
+                            + "?s=" + URLEncoder.encode(tickers[i], "UTF-8")
+                            + "&p=D&b=5&g=0&i=0&r=" + timestamp;
                         URL url = new URL(urlStr);
                         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                         conn.setSSLSocketFactory(sc.getSocketFactory());
+                        conn.setRequestProperty("User-Agent", USER_AGENT);
                         conn.setConnectTimeout(10000);
                         conn.setReadTimeout(10000);
 
                         try {
-                            InputStream in = conn.getInputStream();
-                            Bitmap bmp = BitmapFactory.decodeStream(in);
-                            in.close();
+                            byte[] body = readBody(conn.getInputStream());
+                            if (body.length < MIN_BYTES) {
+                                // Keep whatever chart this slot already holds.
+                                Log.w(TAG, "Rejected " + tickers[i] + " (" + body.length
+                                    + "B, looks like an error image)");
+                                continue;
+                            }
+                            Bitmap bmp = BitmapFactory.decodeByteArray(body, 0, body.length);
                             if (bmp != null) {
                                 bitmaps[i] = bmp;
+                                Log.d(TAG, "Fetched " + tickers[i]);
                             }
-                            Log.d(TAG, "Fetched image " + (i + 1));
+                        } catch (Exception e) {
+                            Log.e(TAG, "Fetch failed: " + tickers[i], e);
                         } finally {
                             conn.disconnect();
                         }
@@ -132,6 +201,20 @@ public class MainActivity extends Activity {
         }).start();
     }
 
+    private static byte[] readBody(InputStream in) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int read;
+        try {
+            while ((read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+            }
+        } finally {
+            in.close();
+        }
+        return out.toByteArray();
+    }
+
     private void showCurrentImage() {
         Bitmap bmp = bitmaps[currentIndex];
         if (bmp != null) {
@@ -139,21 +222,22 @@ public class MainActivity extends Activity {
             chartImage.setImageBitmap(bmp);
             zoomLevel = ZOOM_FIT;
         }
-        counterText.setText((currentIndex + 1) + " / " + IMAGE_COUNT);
+        counterText.setText(tickers[currentIndex] + "   "
+            + (currentIndex + 1) + " / " + tickers.length);
     }
 
     private void advanceSlideshow() {
-        currentIndex = (currentIndex + 1) % IMAGE_COUNT;
+        currentIndex = (currentIndex + 1) % tickers.length;
         showCurrentImage();
     }
 
     private void previousImage() {
-        currentIndex = (currentIndex - 1 + IMAGE_COUNT) % IMAGE_COUNT;
+        currentIndex = (currentIndex - 1 + tickers.length) % tickers.length;
         showCurrentImage();
     }
 
     private void nextImage() {
-        currentIndex = (currentIndex + 1) % IMAGE_COUNT;
+        currentIndex = (currentIndex + 1) % tickers.length;
         showCurrentImage();
     }
 
